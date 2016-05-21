@@ -1,5 +1,6 @@
 body {
   margin: 0px;
+  font-family: 'Roboto', '黑體-繁', '微軟正黑體', sans-serif;
 }
 #windyty {
   height: 840px;
@@ -10,4 +11,23 @@ body {
 }
 #windyty .logo {
   left: 60px !important;
+}
+
+.info-window table {
+  width: 100%;
+}
+.info-window table tr td:first-child {
+  width: 40%;
+  text-align: left;
+}
+.info-window table tr td:nth-child(2) {
+  width: 60%;
+  text-align: right;
+}
+.info-window .last_time {
+  text-align: center;
+  margin: 5px 0px;
+}
+p, td, a {
+  font-family: 'Roboto', '黑體-繁', '微軟正黑體', sans-serif;
 }
