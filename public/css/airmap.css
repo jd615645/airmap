@@ -1,0 +1,13 @@
+body {
+  margin: 0px;
+}
+#windyty {
+  height: 840px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+}
+#windyty .logo {
+  left: 60px !important;
+}
