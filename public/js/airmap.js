@@ -17,40 +17,85 @@ var html = '<table width="100%"><tbody><tr><td>空氣溫度</td><td>-- °C</td><
 // @map is instance of Leaflet maps
 //
 function windytyMain(map) {
+  
+  L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+    opacity: 0.5
+  }).addTo(map);
+
+  var $range = $('#range'),
+      $state = $('#state');
+
+  // Set minimum and maximum timestamp value
+  // for current overlay. Do not forget to check
+  // time boundaries after changing overlay.
+  range.max = W.timeline.end;
+  range.min = W.timeline.start;
+
+  // Handle change of <input range>
+  range.onchange = function(event) {
+    W.setTimestamp(+event.target.value) 
+  }  
+
+  // Display actual state of a map
+  W.on('redrawFinished',function( displayedParams ) {
+    state.innerHTML = new Date( displayedParams.timestamp ).toString();
+  })
+
   // LASS
   $.getJSON('./json/LASS_last.json', function(data) {
-      $.each(data, function(ik, iv) {
-        // console.log(iv);
-        var siteName = iv.SiteName,
-            siteType = iv.SiteGroup,
-            channelId = '',
-            pm25 = iv.Data.Dust2_5,
-            humidity = iv.Data.Humidity,
-            temperature = iv.Data.Temperature,
-            last_time = iv.Data.Create_at,
-            lat = iv.LatLng.lat,
-            lng = iv.LatLng.lng;
-        L.marker([lat, lng], {icon: color(siteType, pm25)})
-         .bindPopup(info_html(siteName, siteType, channelId, pm25, humidity, temperature, last_time)).openPopup()
-         .addTo(map);
-      });
+    $.each(data, function(ik, iv) {
+      // console.log(iv);
+
+
+      var siteName = iv.SiteName,
+          siteType = iv.SiteGroup,
+          channelId = '',
+          pm25 = iv.Data.Dust2_5,
+          humidity = iv.Data.Humidity,
+          temperature = iv.Data.Temperature,
+          last_time = iv.Data.Create_at,
+          lat = iv.LatLng.lat,
+          lng = iv.LatLng.lng;
+      L.marker([lat, lng], {icon: color(siteType, pm25)})
+       .bindPopup(info_html(siteName, siteType, channelId, pm25, humidity, temperature, last_time)).openPopup()
+       .addTo(map);
+    });
   });
   $.getJSON('./json/EPA_last.json', function(data) {
-      $.each(data, function(ik, iv) {
-        // console.log(iv);
-        var siteName = iv.SiteName,
-            siteType = iv.SiteGroup,
-            channelId = iv.Channel_id,
-            pm25 = iv.Data.Dust2_5,
-            humidity = '--',
-            temperature = '--',
-            last_time = iv.Data.Create_at,
-            lat = iv.LatLng.lat,
-            lng = iv.LatLng.lng;
-        L.marker([lat, lng], {icon: color(siteType, pm25)})
-         .bindPopup(info_html(siteName, siteType, channelId, pm25, humidity, temperature, last_time)).openPopup()
-         .addTo(map);
-      });
+    $.each(data, function(ik, iv) {
+      // console.log(iv);
+      var siteName = iv.SiteName,
+          siteType = iv.SiteGroup,
+          channelId = iv.Channel_id,
+          pm25 = iv.Data.Dust2_5,
+          humidity = '--',
+          temperature = '--',
+          last_time = iv.Data.Create_at,
+          lat = iv.LatLng.lat,
+          lng = iv.LatLng.lng;
+      L.marker([lat, lng], {icon: color(siteType, pm25)})
+       .bindPopup(info_html(siteName, siteType, channelId, pm25, humidity, temperature, last_time)).openPopup()
+       .addTo(map);
+    });
+  });
+  $.getJSON('./json/Indie_last.json', function(data) {
+    $.each(data, function(ik, iv) {
+      // console.log(iv);
+      var siteName = iv.SiteName,
+          siteType = iv.SiteGroup,
+          channelId = iv.Channel_id,
+          pm25 = iv.Data.Dust2_5,
+          humidity = '--',
+          temperature = '--',
+          last_time = iv.Data.Create_at,
+          lat = iv.LatLng.lat,
+          lng = iv.LatLng.lng;
+      // console.log(lat + ', ' + lng);
+      L.marker([lat, lng], {icon: color(siteType, pm25)})
+       .bindPopup(info_html(siteName, siteType, channelId, pm25, humidity, temperature, last_time)).openPopup()
+       .addTo(map);
+    });
   });
 }
 

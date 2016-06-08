@@ -8,9 +8,12 @@ html
     link(rel='stylesheet', href='./css/airmap.css')
   body
     #windyty
+    p Displayed parameters: 
+      span#state
+    input#range(type='range', min='0', max='10', style='width:100%;')
 
     script(type='text/javascript' src='http://code.jquery.com/jquery-2.2.0.js')
     script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js')
     script(src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.5/leaflet.js')
     script(src='./js/airmap.js')
-    script(async='', defer='', src='http://api.windyty.com/v2.0/boot.js')
+    script(async='', defer='', src='http://api.windyty.com/v2.1/boot.js')

@@ -3,10 +3,10 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res) {
-  res.render('index');
-});
-router.get('/map', function(req, res) {
   res.render('airmap');
 });
+// router.get('/map', function(req, res) {
+//   res.render('airmap');
+// });
 
 module.exports = router;

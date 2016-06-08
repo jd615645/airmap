@@ -1,0 +1,10 @@
+[{
+	"Channel_id" : 83508,
+	"SiteGroup" : "Pilot",
+	"Maker" : "Kiang",
+	"Option" : {
+		"Temperature" : "field2",
+		"Humidity" : "field3",
+		"Dust2_5" : "field1"
+	}
+}]
