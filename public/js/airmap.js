@@ -1,5 +1,7 @@
 var dust2_5_NASA_gap = [0, 3, 5, 8, 10, 13, 15, 18, 20, 35, 50, 65];
 
+var mapUrl = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png';
+
 var windytyInit = {
   // Required: API key
   key: 'PsL-At-XpsPTZexBwUkO7Mx5I',
@@ -42,61 +44,66 @@ function windytyMain(map) {
     state.innerHTML = new Date( displayedParams.timestamp ).toString();
   })
 
-  // LASS
-  $.getJSON('./json/LASS_last.json', function(data) {
-    $.each(data, function(ik, iv) {
-      // console.log(iv);
+  L.easyButton('fa-globe', function(btn, map){
+    alert('hello, world!');
+  }).addTo( map ); // probably just `map`
+
+  // // LASS
+  // $.getJSON('./json/LASS_last.json', function(data) {
+  //   $.each(data, function(ik, iv) {
+  //     // console.log(iv);
 
 
-      var siteName = iv.SiteName,
-          siteType = iv.SiteGroup,
-          channelId = '',
-          pm25 = iv.Data.Dust2_5,
-          humidity = iv.Data.Humidity,
-          temperature = iv.Data.Temperature,
-          last_time = iv.Data.Create_at,
-          lat = iv.LatLng.lat,
-          lng = iv.LatLng.lng;
-      L.marker([lat, lng], {icon: color(siteType, pm25)})
-       .bindPopup(info_html(siteName, siteType, channelId, pm25, humidity, temperature, last_time)).openPopup()
-       .addTo(map);
-    });
-  });
-  $.getJSON('./json/EPA_last.json', function(data) {
-    $.each(data, function(ik, iv) {
-      // console.log(iv);
-      var siteName = iv.SiteName,
-          siteType = iv.SiteGroup,
-          channelId = iv.Channel_id,
-          pm25 = iv.Data.Dust2_5,
-          humidity = '--',
-          temperature = '--',
-          last_time = iv.Data.Create_at,
-          lat = iv.LatLng.lat,
-          lng = iv.LatLng.lng;
-      L.marker([lat, lng], {icon: color(siteType, pm25)})
-       .bindPopup(info_html(siteName, siteType, channelId, pm25, humidity, temperature, last_time)).openPopup()
-       .addTo(map);
-    });
-  });
-  $.getJSON('./json/Indie_last.json', function(data) {
-    $.each(data, function(ik, iv) {
-      // console.log(iv);
-      var siteName = iv.SiteName,
-          siteType = iv.SiteGroup,
-          channelId = iv.Channel_id,
-          pm25 = iv.Data.Dust2_5,
-          humidity = '--',
-          temperature = '--',
-          last_time = iv.Data.Create_at,
-          lat = iv.LatLng.lat,
-          lng = iv.LatLng.lng;
-      // console.log(lat + ', ' + lng);
-      L.marker([lat, lng], {icon: color(siteType, pm25)})
-       .bindPopup(info_html(siteName, siteType, channelId, pm25, humidity, temperature, last_time)).openPopup()
-       .addTo(map);
-    });
-  });
+  //     var siteName = iv.SiteName,
+  //         siteType = iv.SiteGroup,
+  //         channelId = '',
+  //         pm25 = iv.Data.Dust2_5,
+  //         humidity = iv.Data.Humidity,
+  //         temperature = iv.Data.Temperature,
+  //         last_time = iv.Data.Create_at,
+  //         lat = iv.LatLng.lat,
+  //         lng = iv.LatLng.lng;
+  //     L.marker([lat, lng], {icon: color(siteType, pm25)})
+  //      .bindPopup(info_html(siteName, siteType, channelId, pm25, humidity, temperature, last_time)).openPopup()
+  //      .addTo(map);
+  //   });
+  // });
+  // $.getJSON('./json/EPA_last.json', function(data) {
+  //   $.each(data, function(ik, iv) {
+  //     // console.log(iv);
+  //     var siteName = iv.SiteName,
+  //         siteType = iv.SiteGroup,
+  //         channelId = iv.Channel_id,
+  //         pm25 = iv.Data.Dust2_5,
+  //         humidity = '--',
+  //         temperature = '--',
+  //         last_time = iv.Data.Create_at,
+  //         lat = iv.LatLng.lat,
+  //         lng = iv.LatLng.lng;
+  //     L.marker([lat, lng], {icon: color(siteType, pm25)})
+  //      .bindPopup(info_html(siteName, siteType, channelId, pm25, humidity, temperature, last_time)).openPopup()
+  //      .addTo(map);
+  //   });
+  // });
+  // $.getJSON('./json/Indie_last.json', function(data) {
+  //   $.each(data, function(ik, iv) {
+  //     // console.log(iv);
+  //     var siteName = iv.SiteName,
+  //         siteType = iv.SiteGroup,
+  //         channelId = iv.Channel_id,
+  //         pm25 = iv.Data.Dust2_5,
+  //         humidity = '--',
+  //         temperature = '--',
+  //         last_time = iv.Data.Create_at,
+  //         lat = iv.LatLng.lat,
+  //         lng = iv.LatLng.lng;
+  //     // console.log(lat + ', ' + lng);
+  //     L.marker([lat, lng], {icon: color(siteType, pm25)})
+  //      .bindPopup(info_html(siteName, siteType, channelId, pm25, humidity, temperature, last_time)).openPopup()
+  //      .addTo(map);
+  //   });
+  // });
+
 }
 
 function color(siteType, pm25) {
