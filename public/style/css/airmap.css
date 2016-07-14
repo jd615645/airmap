@@ -12,7 +12,7 @@ a {
 }
 #map-wrapper {
   width: 100%;
-  height: 95%;
+  height: 100%;
   position: relative;
 }
 #windyty {
@@ -43,9 +43,6 @@ a {
 .info-window table .last_time {
   text-align: center;
   margin: 5px 0px;
-}
-.last_time {
-  margin-top: 0px;
 }
 .info-window table td:first-child {
   width: 40%;

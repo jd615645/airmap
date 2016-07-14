@@ -50,8 +50,8 @@ function windytyMain(map) {
   // W.on('redrawFinished',function( displayedParams ) {
   //   state.innerHTML = new Date( displayedParams.timestamp ).toString();
   // },'test')
-  
-  
+
+
   $.each(air_group, function(ik, iv) {
     $.getJSON('./json/' + iv + '_last.json', function(data) {
       air_site[iv] = [];
@@ -89,11 +89,38 @@ function windytyMain(map) {
           console.log(air_site[iv]);
           console.log(err.message);
         }
-        
+
       });
     });
   });
 }
+$('#type-menu').on('click', '.item', function() {
+  marker_view = parseInt($(this).attr('value'));
+  switch (marker_view) {
+    case 1:
+    case 2:
+      $.each(air_group, function(ik, iv) {
+        $.each(marker[iv], function(jk, jv) {
+          jv.setStyle({color: markerColor(air_site[iv][jk].pm25)});
+        });
+      });
+      break;
+    case 3:
+      $.each(air_group, function(ik, iv) {
+        $.each(marker[iv], function(jk, jv) {
+          jv.setStyle({color: markerColor(air_site[iv][jk].temperature)});
+        });
+      });
+      break;
+    case 4:
+      $.each(air_group, function(ik, iv) {
+        $.each(marker[iv], function(jk, jv) {
+          jv.setStyle({color: markerColor(air_site[iv][jk].humidity)});
+        });
+      });
+      break;
+  }
+});
 
 $('#type-menu button').click(function() {
   marker_view = parseInt($(this).attr('value'));
@@ -167,10 +194,8 @@ function info_html(siteName, siteType, channelId, pm25, humidity, temperature, l
       url = 'https://thingspeak.com/channels/' + channelId;
       break;
   }
-  
+
   return '<div class="info-window"><a href="' + url + '" target="_blank"><h4>' + siteName + '</h4></a><p class="last_time">資料時間 ' + last_time + '</p><table><tbody><tr><td>PM2.5</td><td>' + pm25 + ' μg/m<sup>3</sup></td></tr><tr><td>空氣溫度</td><td>'+ temperature +' °C</td></tr><tr><td>相對濕度</td><td>'+ humidity +' %</td></tr></tbody></table></div>';
 }
-
-// PM25 s_d0
-// temperature s_t0
-//  HUMIDITY s_d0
+$('.ui.dropdown').dropdown();
+$('#type-menu .item:first-child').click();
