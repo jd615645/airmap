@@ -44,6 +44,9 @@ a {
   text-align: center;
   margin: 5px 0px;
 }
+.last_time {
+  margin-top: 0px;
+}
 .info-window table td:first-child {
   width: 40%;
   text-align: left;
