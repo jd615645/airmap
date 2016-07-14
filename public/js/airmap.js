@@ -6,10 +6,9 @@ var temp_gap = [0, 5, 10, 15, 20, 25, 30, 35, 40],
     temp_gap_color = ['#215968', '#b7dee8', '#77933c', '#d7e4bd', '#fac090', '#e46c0a', '#ff0000', '#800000'];
 var humi_gap = [20, 40, 60, 80],
     humi_gap_color = ['#fac090', '#76b531', '#b7dee8', '#215968'];
-var air_group = ['LASS', 'EPA', 'Indie'];
 var marker_view = 1;
-var marker = {'LASS': [], 'EPA': [], 'Indie': []};
-var leaflet_map;
+var air_group = ['LASS', 'Airbox', 'Indie', 'ProbeCube'];
+var marker = {'LASS': [], 'Airbox': [], 'Indie': [], 'ProbeCube': []};
 var air_site = [];
 
 var windytyInit = {
@@ -29,7 +28,6 @@ var html = '<table width="100%"><tbody><tr><td>空氣溫度</td><td>-- °C</td><
 // @map is instance of Leaflet maps
 //
 function windytyMain(map) {
-  leaflet_map = map;
   L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
     opacity: 0.3
@@ -53,49 +51,45 @@ function windytyMain(map) {
   //   state.innerHTML = new Date( displayedParams.timestamp ).toString();
   // },'test')
   
-  $.ajax({
-      url: "http://g0vairmap.3203.info/Data/ProbeCube_last.json",
-   
-      // The name of the callback parameter, as specified by the YQL service
-      jsonp: "callback",
-   
-      // Tell jQuery we're expecting JSONP
-      dataType: "jsonp",
-   
-      // Tell YQL what we want and that we want JSON
-      data: {
-          q: "select title,abstract,url from search.news where query=\"cat\"",
-          format: "json"
-      },
-   
-      // Work with the response
-      success: function( response ) {
-          console.log( response ); // server response
-      },
-      fail: function(  ) {
-          console.log( 'fail' ); // server response
-      }
-  });
-
+  
   $.each(air_group, function(ik, iv) {
     $.getJSON('./json/' + iv + '_last.json', function(data) {
       air_site[iv] = [];
+      var num = 0;
       $.each(data, function(jk, jv) {
         var siteName = jv.SiteName,
             siteType = jv.SiteGroup,
-            channelId = (jv.Channel_id === undefined ? '' : jv.Channel_id),
-            pm25 = (jv.Data.Dust2_5  === undefined ? '-' : jv.Data.Dust2_5),
-            humidity = (jv.Data.Humidity === undefined ? '-' : jv.Data.Humidity),
-            temperature = (jv.Data.Temperature === undefined ? '-' : jv.Data.Temperature),
+            channelId = (typeof jv.Channel_id == "undefined" ? '' : jv.Channel_id),
+            pm25 = (typeof jv.Data.Dust2_5  == "undefined" ? '-' : jv.Data.Dust2_5),
+            humidity = (typeof jv.Data.Humidity === "undefined" ? '-' : jv.Data.Humidity),
+            temperature = (typeof jv.Data.Temperature === "undefined" ? '-' : jv.Data.Temperature),
             last_time = jv.Data.Create_at,
             lat = jv.LatLng.lat,
             lng = jv.LatLng.lng;
-        air_site[iv][jk] = {siteName: siteName, siteType: siteType, channelId: channelId, pm25: pm25, humidity: humidity, temperature: temperature, last_time: last_time, lat: lat, lng: lng};
-        marker[iv][jk] = L.circleMarker([lat, lng], {color: markerColor(pm25)})
-                          .bindPopup(info_html(siteName, siteType, channelId, pm25, humidity, temperature, last_time));
+        if(lat != null && lng != null) {
+          air_site[iv][num] = {siteName: siteName,
+                              siteType: siteType,
+                              channelId: channelId,
+                              pm25: pm25,
+                              humidity: humidity,
+                              temperature: temperature,
+                              last_time: last_time,
+                              lat: lat,
+                              lng: lng};
+          marker[iv][num] = L.circleMarker([lat, lng], {color: markerColor(pm25)})
+                            .bindPopup(info_html(siteName, siteType, channelId, pm25, humidity, temperature, last_time));
+          num++;
+        }
       });
       $.each(marker[iv], function(key, val) {
-        val.addTo(map);
+        try {
+          val.addTo(map);
+        }
+        catch(err) {
+          console.log(air_site[iv]);
+          console.log(err.message);
+        }
+        
       });
     });
   });
@@ -160,17 +154,6 @@ function markerColor(data) {
   if (data == null) color = '#000';
 
   return color;
-}
-
-function color(siteType, pm25) {
-  var num = 0;
-  $.each(pm25_NASA_gap, function(key, val) {
-    if(pm25 >= val)
-      num = key;
-  });
-  if(siteType == 'EPA')
-    return L.icon({iconUrl: './img/ddn' + num + '.png', iconSize: [19, 19],});
-  return L.icon({iconUrl: './img/cdn' + num + '.png', iconSize: [19, 19],});
 }
 
 function info_html(siteName, siteType, channelId, pm25, humidity, temperature, last_time) {
