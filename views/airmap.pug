@@ -1,17 +1,20 @@
 extends layout
 block css
   link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css')
-  link(rel='stylesheet', href='./css/easybutton.css')
-  link(rel='stylesheet', href='./css/airmap.css')
+  link(rel='stylesheet', href='./style/css/airmap.css')
 block content
-  #windyty
-  p Displayed parameters: 
+  #map-wrapper
+    #windyty
+    #type-menu
+      button.ui.inverted.grey.button(value='1') pm2.5
+      button.ui.inverted.grey.button(value='2') pm2.5 NASA
+      button.ui.inverted.grey.button(value='3') 溫度
+      button.ui.inverted.grey.button(value='4') 濕度
+  //- p Displayed parameters:
     span#state
-  input#range(type='range', min='0', max='10', style='width:100%;')
-  .my-div-icon
+  //- input#range(type='range', min='0', max='10', style='width:100%;')
 
 block append js
   script(src='http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js')
-  script(src='./js/easybutton.js')
   script(async='', defer='', src='http://api.windyty.com/v2.1/boot.js')
   script(src='./js/airmap.js')
