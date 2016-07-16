@@ -28,18 +28,27 @@ p, td, a { font-family: 'Roboto', '黑體-繁', '微軟正黑體', sans-serif; }
   top: 0;
   margin-top: 5px;
   margin-left: 5px;
-
-  button { margin-bottom: 3px; }
+  width: 115px;
+  // .dropdown { min-width: 115px; }
+}
+#site-menu {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 0;
+  margin-top: 50px;
+  margin-left: 5px;
+  button {
+    margin-bottom: 3px;
+    width: 115px;
+  }
 }
 
 .info-window table {
   width: 100%;
-
   .last_time {
     text-align: center;
-    margin: 5px 0px;
   }
-
   td {
     &:first-child {
       width: 40%;

@@ -6,15 +6,48 @@ block content
   #map-wrapper
     #windyty
     #type-menu
-      .ui.selection.dropdown
+      .ui.fluid.selection.dropdown
         input(type='hidden', name='viewType')
         i.dropdown.icon
-        .default.text Gender
+        .default.text Select
         .menu
           .item(value='1') pm2.5
           .item(value='2') pm2.5 NASA
           .item(value='3') 溫度
           .item(value='4') 濕度
+    #site-menu
+      button.ui.inverted.grey.button 篩選條件
+      .ui.modal#select-window
+        i.close.icon
+        .header
+          | 篩選條件
+        .content
+          .ui.relaxed.list
+            .item
+              .ui.master.checkbox
+                input(type='checkbox')
+                label 全選
+              .list
+                .item
+                  .ui.child.checkbox
+                    input(type='checkbox', name='LASS')
+                    label
+                      | LASS
+                      .ui.label 1
+                .item
+                  .ui.child.checkbox
+                    input(type='checkbox', name='Airbox')
+                    label AirBox
+                .item
+                  .ui.child.checkbox
+                    input(type='checkbox', name='Indie')
+                    label Indie
+                .item
+                  .ui.child.checkbox
+                    input(type='checkbox', name='ProbeCube')
+                    label ProbeCube
+        .actions
+          button.ui.button 確定
 
 
 block append js

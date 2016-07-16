@@ -14,7 +14,6 @@ var air_site = [];
 var windytyInit = {
   // Required: API key
   key: 'PsL-At-XpsPTZexBwUkO7Mx5I',
-
   // Optional: Initial state of the map
   lat: 23.854271,
   lon: 120.951906,
@@ -24,33 +23,14 @@ var windytyInit = {
 var html = '<table width="100%"><tbody><tr><td>空氣溫度</td><td>-- °C</td></tr><tr><td>相對濕度</td><td>-- %</td></tr><tr><td>PM2.5</td><td>-- μg/m<sup>3</sup></td></tr></tbody></table>';
 // Required: Windyty main function is called after
 // initialization of API
-//
 // @map is instance of Leaflet maps
-//
+
+var test;
 function windytyMain(map) {
   L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
     opacity: 0.3
   }).addTo(map);
-  // var $range = $('#range'),
-  //     $state = $('#state');
-
-  // // Set minimum and maximum timestamp value
-  // // for current overlay. Do not forget to check
-  // // time boundaries after changing overlay.
-  // range.max = W.timeline.end;
-  // range.min = W.timeline.start;
-
-  // // Handle change of <input range>
-  // range.onchange = function(event) {
-  //   W.setTimestamp(+event.target.value)
-  // }
-
-  // // Display actual state of a map
-  // W.on('redrawFinished',function( displayedParams ) {
-  //   state.innerHTML = new Date( displayedParams.timestamp ).toString();
-  // },'test')
-
 
   $.each(air_group, function(ik, iv) {
     $.getJSON('./json/' + iv + '_last.json', function(data) {
@@ -67,29 +47,32 @@ function windytyMain(map) {
             lat = jv.LatLng.lat,
             lng = jv.LatLng.lng;
         if(lat != null && lng != null) {
-          air_site[iv][num] = {siteName: siteName,
-                              siteType: siteType,
-                              channelId: channelId,
-                              pm25: pm25,
-                              humidity: humidity,
-                              temperature: temperature,
-                              last_time: last_time,
-                              lat: lat,
-                              lng: lng};
-          marker[iv][num] = L.circleMarker([lat, lng], {color: markerColor(pm25)})
+          air_site[iv][num] =
+          {
+            siteName: siteName,
+            siteType: siteType,
+            channelId: channelId,
+            pm25: pm25,
+            humidity: humidity,
+            temperature: temperature,
+            last_time: last_time,
+            lat: lat,
+            lng: lng
+          };
+
+
+          marker[iv][num] = L.circleMarker([lat, lng],
+            {
+              color: markerColor(pm25),
+              opacity: 1,
+              fillOpacity: 0.5,
+            })
                             .bindPopup(info_html(siteName, siteType, channelId, pm25, humidity, temperature, last_time));
           num++;
         }
       });
       $.each(marker[iv], function(key, val) {
-        try {
-          val.addTo(map);
-        }
-        catch(err) {
-          console.log(air_site[iv]);
-          console.log(err.message);
-        }
-
+        val.addTo(map);
       });
     });
   });
@@ -122,33 +105,30 @@ $('#type-menu').on('click', '.item', function() {
   }
 });
 
-$('#type-menu button').click(function() {
-  marker_view = parseInt($(this).attr('value'));
-  switch (marker_view) {
-    case 1:
-    case 2:
-      $.each(air_group, function(ik, iv) {
-        $.each(marker[iv], function(jk, jv) {
-          jv.setStyle({color: markerColor(air_site[iv][jk].pm25)});
-        });
-      });
-      break;
-    case 3:
-      $.each(air_group, function(ik, iv) {
-        $.each(marker[iv], function(jk, jv) {
-          jv.setStyle({color: markerColor(air_site[iv][jk].temperature)});
-        });
-      });
-      break;
-    case 4:
-      $.each(air_group, function(ik, iv) {
-        $.each(marker[iv], function(jk, jv) {
-          jv.setStyle({color: markerColor(air_site[iv][jk].humidity)});
-        });
-      });
-      break;
-  }
+$('#site-menu button').click(function() {
+  $('#select-window').modal('show');
 });
+$('#select-window button').click(function() {
+  $.each(air_group, function(key, val) {
+    var checked = $('input[name="' + val + '"]').parent().checkbox('is checked');
+    if(checked)
+      showSite(val);
+    else
+      hideSite(val);
+  });
+  $('#select-window').modal('hide');
+});
+
+function showSite(site) {
+  $.each(marker[site], function(key, val) {
+    val.setStyle({opacity: 1, fillOpacity: 0.5});
+  });
+}
+function hideSite(site) {
+  $.each(marker[site], function(key, val) {
+    val.setStyle({opacity: 0, fillOpacity: 0});
+  });
+}
 
 function markerColor(data) {
   var color = '#000';
@@ -178,14 +158,15 @@ function markerColor(data) {
       });
       break;
   }
-  if (data == null) color = '#000';
+  if (data == null)
+    color = '#000';
 
   return color;
 }
 
 function info_html(siteName, siteType, channelId, pm25, humidity, temperature, last_time) {
+  var url, html='';
   if (pm25 == null) pm25 = '-';
-  var url;
   switch(siteType) {
     case 'LASS':
       url = 'http://nrl.iis.sinica.edu.tw/LASS/show.php?device_id=' + siteName;
@@ -199,3 +180,44 @@ function info_html(siteName, siteType, channelId, pm25, humidity, temperature, l
 }
 $('.ui.dropdown').dropdown();
 $('#type-menu .item:first-child').click();
+$('.ui.checkbox').checkbox();
+
+$('.list .master.checkbox').checkbox({
+  // check all children
+  onChecked: function() {
+    var $childCheckbox = $(this).closest('.checkbox').siblings('.list').find('.checkbox');
+    $childCheckbox.checkbox('check');
+  },
+  // uncheck all children
+  onUnchecked: function() {
+    var $childCheckbox = $(this).closest('.checkbox').siblings('.list').find('.checkbox');
+    $childCheckbox.checkbox('uncheck');
+  }
+});
+$('.list .child.checkbox').checkbox({
+  // Fire on load to set parent value
+  fireOnInit : true,
+  // Change parent state on each child checkbox change
+  onChange   : function() {
+    var $listGroup      = $(this).closest('.list'),
+        $parentCheckbox = $listGroup.closest('.item').children('.checkbox'),
+        $checkbox       = $listGroup.find('.checkbox'),
+        allChecked      = true,
+        allUnchecked    = true;
+    // check to see if all other siblings are checked or unchecked
+    $checkbox.each(function() {
+      if( $(this).checkbox('is checked') )
+        allUnchecked = false;
+      else
+        allChecked = false;
+    });
+    // set parent checkbox state, but dont trigger its onChange callback
+    if(allChecked)
+      $parentCheckbox.checkbox('set checked');
+    else if(allUnchecked)
+      $parentCheckbox.checkbox('set unchecked');
+    else
+      $parentCheckbox.checkbox('set indeterminate');
+  }
+});
+$('.master.checkbox').checkbox('check');
