@@ -60,7 +60,6 @@ function windytyMain(map) {
             lng: lng
           };
 
-
           marker[iv][num] = L.circleMarker([lat, lng],
             {
               color: markerColor(pm25),

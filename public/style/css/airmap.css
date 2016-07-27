@@ -26,19 +26,35 @@ a {
 #windyty .logo {
   left: 60px !important;
 }
+#windyty #contrib {
+  right: 0px !important;
+  bottom: 0px !important;
+  left: 10px !important;
+}
 #type-menu {
   position: absolute;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: vertical;
+  -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-          flex-direction: column;
+      -ms-flex-direction: row;
+          flex-direction: row;
   top: 0;
   margin-top: 5px;
   margin-left: 5px;
   width: 115px;
+}
+#bar {
+  position: absolute;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  right: 10px;
+  bottom: 8px;
+}
+#bar img {
+  height: 20px;
 }
 #site-menu {
   position: absolute;
