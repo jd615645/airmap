@@ -111,7 +111,7 @@ $('#select-window button').click(function() {
   $.each(air_group, function(key, val) {
     var checked = $('input[name="' + val + '"]').parent().checkbox('is checked');
     if(checked)
-      showSite(val);
+      showSite(vmarker_viewal);
     else
       hideSite(val);
   });
@@ -137,24 +137,28 @@ function markerColor(data) {
         if(data >= val)
           color = pm25_gap_color[key];
       });
+      $('#bar img').attr('src', './img/pm25_bar.png');
       break;
     case 2:
       $.each(pm25_NASA_gap, function(key, val) {
         if(data >= val)
           color = pm25_NASA_gap_color[key];
       });
+      $('#bar img').attr('src', './img/pm25_NASA_bar.png');
       break;
     case 3:
       $.each(temp_gap, function(key, val) {
         if(data >= val)
           color = temp_gap_color[key];
       });
+      $('#bar img').attr('src', './img/temp_bar.png');
       break;
     case 4:
       $.each(humi_gap, function(key, val) {
         if(data >= val)
           color = humi_gap_color[key];
       });
+      $('#bar img').attr('src', './img/humi_bar.png');
       break;
   }
   if (data == null)
@@ -219,4 +223,6 @@ $('.list .child.checkbox').checkbox({
       $parentCheckbox.checkbox('set indeterminate');
   }
 });
+$('.ui.sidebar').sidebar('setting', 'transition', 'overlay')
+                .sidebar('toggle');
 $('.master.checkbox').checkbox('check');

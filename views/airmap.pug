@@ -3,7 +3,11 @@ block css
   link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css')
   link(rel='stylesheet', href='./style/css/airmap.css')
 block content
-  #map-wrapper
+  .ui.sidebar.left.inverted.vertical.menu#map-wrapper
+    a.item 1
+    a.item 2
+    a.item 3
+  .pusher#map-wrapper
     #windyty
     #type-menu
       .ui.fluid.selection.dropdown
@@ -51,6 +55,7 @@ block content
 
 
 block append js
-  script(src='http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js')
+  //- script(src='http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js')
+  script(src='./js/leaflet.js')
   script(async='', defer='', src='http://api.windyty.com/v2.1/boot.js')
   script(src='./js/airmap.js')
