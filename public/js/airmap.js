@@ -20,17 +20,19 @@ var windytyInit = {
   zoom: 8,
 }
 
+
 var html = '<table width="100%"><tbody><tr><td>空氣溫度</td><td>-- °C</td></tr><tr><td>相對濕度</td><td>-- %</td></tr><tr><td>PM2.5</td><td>-- μg/m<sup>3</sup></td></tr></tbody></table>';
 // Required: Windyty main function is called after
 // initialization of API
 // @map is instance of Leaflet maps
 
-var test;
 function windytyMain(map) {
   L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
     opacity: 0.3
   }).addTo(map);
+
+  var sidebar = L.control.sidebar('sidebar').addTo(map);
 
   $.each(air_group, function(ik, iv) {
     $.getJSON('./json/' + iv + '_last.json', function(data) {
@@ -76,8 +78,10 @@ function windytyMain(map) {
     });
   });
 }
-$('#type-menu').on('click', '.item', function() {
+$('#filter_type button').click(function() {
   marker_view = parseInt($(this).attr('value'));
+  $('#filter_type').find('.blue').removeClass('blue');
+  $(this).addClass('blue');
   switch (marker_view) {
     case 1:
     case 2:
@@ -104,9 +108,6 @@ $('#type-menu').on('click', '.item', function() {
   }
 });
 
-$('#site-menu button').click(function() {
-  $('#select-window').modal('show');
-});
 $('#select-window button').click(function() {
   $.each(air_group, function(key, val) {
     var checked = $('input[name="' + val + '"]').parent().checkbox('is checked');
@@ -182,7 +183,7 @@ function info_html(siteName, siteType, channelId, pm25, humidity, temperature, l
   return '<div class="info-window"><a href="' + url + '" target="_blank"><h4>' + siteName + '</h4></a><p class="last_time">資料時間 ' + last_time + '</p><table><tbody><tr><td>PM2.5</td><td>' + pm25 + ' μg/m<sup>3</sup></td></tr><tr><td>空氣溫度</td><td>'+ temperature +' °C</td></tr><tr><td>相對濕度</td><td>'+ humidity +' %</td></tr></tbody></table></div>';
 }
 $('.ui.dropdown').dropdown();
-$('#type-menu .item:first-child').click();
+$('#filter_type button[value="1"]').click();
 $('.ui.checkbox').checkbox();
 
 $('.list .master.checkbox').checkbox({

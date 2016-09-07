@@ -1,61 +1,68 @@
 extends layout
 block css
   link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css')
-  link(rel='stylesheet', href='./style/css/airmap.css')
+  link(rel='stylesheet/less', type='text/css', href='./style/airmap.less')
+  link(rel='stylesheet', href='./style/sidebar.css')
 block content
-  .ui.sidebar.left.inverted.vertical.menu#map-wrapper
-    a.item 1
-    a.item 2
-    a.item 3
-  .pusher#map-wrapper
+  #sidebar.sidebar.collapsed
+    // Nav tabs
+    .sidebar-tabs
+      ul(role='tablist')
+        li
+          a(href='#filter', role='tab')
+            i.fa.fa-filter
+        li
+          a(href='#profile', role='tab')
+            i.fa.fa-user
+    // Tab panes
+    .sidebar-content
+      #filter.sidebar-pane
+        h1.sidebar-header
+          | 篩選條件
+          span.sidebar-close
+            i.fa.fa-caret-left
+        .sidebar-body
+          h2 測量類別
+          #filter_type
+            .ui.grid.stackable
+              .eight.wide.column
+                button.ui.fluid.button(value='1') pm2.5
+              .eight.wide.column
+                button.ui.fluid.button(value='2') pm2.5_NASA
+              .eight.wide.column
+                button.ui.fluid.button(value='3') 溫度
+              .eight.wide.column
+                button.ui.fluid.button(value='4') 濕度
+          h2 群組
+          #filter_group
+            .ui.grid.stackable
+              .eight.wide.column
+                button.ui.fluid.button(name='LASS')
+                  | LASS
+              .eight.wide.column
+                button.ui.fluid.button(name='Airbox')
+                  | AirBox
+              .eight.wide.column
+                button.ui.fluid.button(name='Indie')
+                  | Indie
+              .eight.wide.column
+                button.ui.fluid.button(name='ProbeCube')
+                  | ProbeCube
+
+      #profile.sidebar-pane
+        h1.sidebar-header
+          | Profile
+          span.sidebar-close
+            i.fa.fa-caret-left
+
+
+  #map-wrapper
     #windyty
-    #type-menu
-      .ui.fluid.selection.dropdown
-        input(type='hidden', name='viewType')
-        i.dropdown.icon
-        .default.text Select
-        .menu
-          .item(value='1') pm2.5
-          .item(value='2') pm2.5 NASA
-          .item(value='3') 溫度
-          .item(value='4') 濕度
     #bar
       img(src='./img/pm25_bar.png')
-    #site-menu
-      button.ui.inverted.grey.button 篩選條件
-      .ui.modal#select-window
-        i.close.icon
-        .header
-          | 篩選條件
-        .content
-          .ui.relaxed.list
-            .item
-              .ui.master.checkbox
-                input(type='checkbox')
-                label 全選
-              .list
-                .item
-                  .ui.child.checkbox
-                    input(type='checkbox', name='LASS')
-                    label LASS
-                .item
-                  .ui.child.checkbox
-                    input(type='checkbox', name='Airbox')
-                    label AirBox
-                .item
-                  .ui.child.checkbox
-                    input(type='checkbox', name='Indie')
-                    label Indie
-                .item
-                  .ui.child.checkbox
-                    input(type='checkbox', name='ProbeCube')
-                    label ProbeCube
-        .actions
-          button.ui.button 確定
-
 
 block append js
-  //- script(src='http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js')
-  script(src='./js/leaflet.js')
+  script(src='http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js')
+  script(src='./js/sidebar.js')
   script(async='', defer='', src='http://api.windyty.com/v2.1/boot.js')
   script(src='./js/airmap.js')
