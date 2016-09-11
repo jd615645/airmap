@@ -108,15 +108,21 @@ $('#filter_type button').click(function() {
   }
 });
 
-$('#select-window button').click(function() {
-  $.each(air_group, function(key, val) {
-    var checked = $('input[name="' + val + '"]').parent().checkbox('is checked');
-    if(checked)
-      showSite(vmarker_viewal);
-    else
-      hideSite(val);
-  });
-  $('#select-window').modal('hide');
+// 篩選group
+$('#filter_group button').click(function() {
+  var groupVisible = $(this).attr('visible');
+  var groupName = $(this).attr('name');
+
+  if (groupVisible == 'true') {
+    $(this).attr('visible', 'false');
+    $(this).removeClass('blue');
+    hideSite(groupName);
+  }
+  else if (groupVisible == 'false') {
+    $(this).attr('visible', 'true');
+    $(this).addClass('blue');
+    showSite(groupName);
+  }
 });
 
 function showSite(site) {
