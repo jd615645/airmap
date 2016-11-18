@@ -1,7 +1,8 @@
 extends layout
 block css
-  link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css')
+  link(rel='stylesheet', href='http://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css')
   link(rel='stylesheet/less', type='text/css', href='./style/airmap.less')
+  link(rel='stylesheet', href='./style/leaflet.css')
   link(rel='stylesheet', href='./style/sidebar.css')
 block content
   #sidebar.sidebar.collapsed
@@ -48,7 +49,57 @@ block content
               .eight.wide.column
                 button.ui.fluid.blue.button(name='ProbeCube', visible='true')
                   | ProbeCube
-
+          h2 顯示圖層
+          #filter_layers
+            .ui.grid.stackable
+              .eight.wide.column
+                button.ui.fluid.blue.button(overlays='wind')
+                  | 風速
+              .eight.wide.column
+                button.ui.fluid.button(overlays='temp')
+                  | 溫度
+              .eight.wide.column
+                button.ui.fluid.button(overlays='pressure')
+                  | 氣壓
+              .eight.wide.column
+                button.ui.fluid.button(overlays='clouds')
+                  | 雲層
+              .eight.wide.column
+                button.ui.fluid.button(overlays='rh')
+                  | rh
+              .eight.wide.column
+                button.ui.fluid.button(overlays='gust')
+                  | gust
+              .eight.wide.column
+                button.ui.fluid.button(overlays='lclouds')
+                  | lclouds
+              .eight.wide.column
+                button.ui.fluid.button(overlays='waves')
+                  | waves
+              .eight.wide.column
+                button.ui.fluid.button(overlays='swell')
+                  | swell
+              .eight.wide.column
+                button.ui.fluid.button(overlays='wwaves')
+                  | wwaves
+              .eight.wide.column
+                button.ui.fluid.button(overlays='swellperiod')
+                  | swellperiod
+              .eight.wide.column
+                button.ui.fluid.button(overlays='sst')
+                  | sst
+              .eight.wide.column
+                button.ui.fluid.button(overlays='sstanom')
+                  | sstanom
+              .eight.wide.column
+                button.ui.fluid.button(overlays='currents')
+                  | currents
+          h2 顯示風力線
+          #wind_layers
+            .ui.grid.stackable
+              .eight.wide.column
+                button.ui.fluid.button
+                  | 風力線
       #profile.sidebar-pane
         h1.sidebar-header
           | Profile
@@ -62,7 +113,9 @@ block content
       img(src='./img/pm25_bar.png')
 
 block append js
-  script(src='http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js')
+  script(src='./js/dojoConfig.js')
+  script(src='./js/leaflet.js')
+  script(src='http://bl.ocks.org/Sumbera/raw/11114288/L.CanvasOverlay.js')
+  script(src='./js/windy.js')
   script(src='./js/sidebar.js')
-  script(async='', defer='', src='http://api.windyty.com/v2.1/boot.js')
   script(src='./js/airmap.js')

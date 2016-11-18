@@ -11,26 +11,26 @@ var air_group = ['LASS', 'Airbox', 'Indie', 'ProbeCube'];
 var marker = {'LASS': [], 'Airbox': [], 'Indie': [], 'ProbeCube': []};
 var air_site = [];
 
-var windytyInit = {
-  // Required: API key
-  key: 'PsL-At-XpsPTZexBwUkO7Mx5I',
-  // Optional: Initial state of the map
-  lat: 23.854271,
-  lon: 120.951906,
-  zoom: 8,
-}
+var map = L.map('windyty').setView([23.854271, 120.951906], 8);
+var hideWindLayer = true;
 
+L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
 
 var html = '<table width="100%"><tbody><tr><td>空氣溫度</td><td>-- °C</td></tr><tr><td>相對濕度</td><td>-- %</td></tr><tr><td>PM2.5</td><td>-- μg/m<sup>3</sup></td></tr></tbody></table>';
 // Required: Windyty main function is called after
 // initialization of API
 // @map is instance of Leaflet maps
 
+windytyMain(map);
+windLayer();
+
 function windytyMain(map) {
-  L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-    opacity: 0.3
-  }).addTo(map);
+  // L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+  //   attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+  //   opacity: 0.3
+  // }).addTo(map);
 
   var sidebar = L.control.sidebar('sidebar').addTo(map);
 
@@ -125,6 +125,13 @@ $('#filter_group button').click(function() {
   }
 });
 
+$('#filter_layers button').click(function() {
+  var overlays = $(this).attr('overlays');
+  $('#filter_layers').find('.blue').removeClass('blue');
+  $(this).addClass('blue');
+  W.setOverlay(overlays);
+})
+
 function showSite(site) {
   $.each(marker[site], function(key, val) {
     val.setStyle({opacity: 1, fillOpacity: 0.5});
@@ -168,8 +175,9 @@ function markerColor(data) {
       $('#bar img').attr('src', './img/humi_bar.png');
       break;
   }
-  if (data == null)
+  if (data == null) {
     color = '#000';
+  }
 
   return color;
 }
@@ -188,48 +196,95 @@ function info_html(siteName, siteType, channelId, pm25, humidity, temperature, l
 
   return '<div class="info-window"><a href="' + url + '" target="_blank"><h4>' + siteName + '</h4></a><p class="last_time">資料時間 ' + last_time + '</p><table><tbody><tr><td>PM2.5</td><td>' + pm25 + ' μg/m<sup>3</sup></td></tr><tr><td>空氣溫度</td><td>'+ temperature +' °C</td></tr><tr><td>相對濕度</td><td>'+ humidity +' %</td></tr></tbody></table></div>';
 }
+
+function windLayer() {
+  var rasterLayer;
+
+  $.get('../json/gfs.json', { cache:true } ).success(function(result) {
+    console.log(result);
+    var timer = null;
+
+    //Add CanvasLayer to the map
+    canvasOverlay = L.canvasOverlay()
+                     .addTo(map);
+
+    //windy object
+    windy = new Windy({canvas: canvasOverlay.canvas(), data: result});
+
+    //prepare context global var
+    context = canvasOverlay.canvas().getContext('2d');
+
+    //start drawing wind map
+    function redraw(overlay, params) {
+      if( timer ) {
+        window.clearTimeout( timer );
+      }
+
+      timer = setTimeout(function() { //showing wind is delayed
+        var bounds = map.getBounds();
+        var size = map.getSize();
+
+        /*context.rect(0,0,3000,3000);
+        context.fillStyle = "red";
+        context.fill();*/
+
+        windy.start( [[0,0],[size.x, size.y]], size.x, size.y,
+            [[bounds._southWest.lng, bounds._southWest.lat ],[bounds._northEast.lng, bounds._northEast.lat]] );
+      },750)
+    }
+
+    //clear canvas and stop animation
+    function clearWind() {
+      windy.stop();
+      context.clearRect(0,0,3000, 3000);
+    }
+
+    map.on('dragstart', function() { clearWind() });
+    map.on('zoomstart', function() { clearWind() });
+    map.on('resize', function() { clearWind() });
+
+    $('#wind_layers button').click(function() {
+      if(hideWindLayer) {
+        $(this).addClass('blue');
+        redraw();
+      }
+      else {
+        $(this).removeClass('blue');
+        clearWind();
+      }
+      hideWindLayer = !hideWindLayer;
+    })
+  })
+
+  // does the browser support canvas?
+  function supports_canvas() {
+    return !!document.createElement("canvas").getContext;
+  }
+
+  function redraw(){
+
+    rasterLayer._element.width = map.width;
+    rasterLayer._element.height = map.height;
+
+    windy.stop();
+
+    var extent = map.geographicExtent;
+    setTimeout(function(){
+      windy.start(
+        [[0,0],[map.width, map.height]],
+        map.width,
+        map.height,
+        [[extent.xmin, extent.ymin],[extent.xmax, extent.ymax]]
+      );
+    },500);
+  }
+}
+
+// init html elements
 $('.ui.dropdown').dropdown();
 $('#filter_type button[value="1"]').click();
 $('.ui.checkbox').checkbox();
 
-$('.list .master.checkbox').checkbox({
-  // check all children
-  onChecked: function() {
-    var $childCheckbox = $(this).closest('.checkbox').siblings('.list').find('.checkbox');
-    $childCheckbox.checkbox('check');
-  },
-  // uncheck all children
-  onUnchecked: function() {
-    var $childCheckbox = $(this).closest('.checkbox').siblings('.list').find('.checkbox');
-    $childCheckbox.checkbox('uncheck');
-  }
-});
-$('.list .child.checkbox').checkbox({
-  // Fire on load to set parent value
-  fireOnInit : true,
-  // Change parent state on each child checkbox change
-  onChange   : function() {
-    var $listGroup      = $(this).closest('.list'),
-        $parentCheckbox = $listGroup.closest('.item').children('.checkbox'),
-        $checkbox       = $listGroup.find('.checkbox'),
-        allChecked      = true,
-        allUnchecked    = true;
-    // check to see if all other siblings are checked or unchecked
-    $checkbox.each(function() {
-      if( $(this).checkbox('is checked') )
-        allUnchecked = false;
-      else
-        allChecked = false;
-    });
-    // set parent checkbox state, but dont trigger its onChange callback
-    if(allChecked)
-      $parentCheckbox.checkbox('set checked');
-    else if(allUnchecked)
-      $parentCheckbox.checkbox('set unchecked');
-    else
-      $parentCheckbox.checkbox('set indeterminate');
-  }
-});
 $('.ui.sidebar').sidebar('setting', 'transition', 'overlay')
                 .sidebar('toggle');
 $('.master.checkbox').checkbox('check');
