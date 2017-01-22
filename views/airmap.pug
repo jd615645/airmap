@@ -12,9 +12,6 @@ block content
         li
           a(href='#filter', role='tab')
             i.fa.fa-filter
-        li
-          a(href='#profile', role='tab')
-            i.fa.fa-user
     // Tab panes
     .sidebar-content
       #filter.sidebar-pane
@@ -49,63 +46,12 @@ block content
               .eight.wide.column
                 button.ui.fluid.blue.button(name='ProbeCube', visible='true')
                   | ProbeCube
-          h2 顯示圖層
-          #filter_layers
-            .ui.grid.stackable
-              .eight.wide.column
-                button.ui.fluid.blue.button(overlays='wind')
-                  | 風速
-              .eight.wide.column
-                button.ui.fluid.button(overlays='temp')
-                  | 溫度
-              .eight.wide.column
-                button.ui.fluid.button(overlays='pressure')
-                  | 氣壓
-              .eight.wide.column
-                button.ui.fluid.button(overlays='clouds')
-                  | 雲層
-              .eight.wide.column
-                button.ui.fluid.button(overlays='rh')
-                  | rh
-              .eight.wide.column
-                button.ui.fluid.button(overlays='gust')
-                  | gust
-              .eight.wide.column
-                button.ui.fluid.button(overlays='lclouds')
-                  | lclouds
-              .eight.wide.column
-                button.ui.fluid.button(overlays='waves')
-                  | waves
-              .eight.wide.column
-                button.ui.fluid.button(overlays='swell')
-                  | swell
-              .eight.wide.column
-                button.ui.fluid.button(overlays='wwaves')
-                  | wwaves
-              .eight.wide.column
-                button.ui.fluid.button(overlays='swellperiod')
-                  | swellperiod
-              .eight.wide.column
-                button.ui.fluid.button(overlays='sst')
-                  | sst
-              .eight.wide.column
-                button.ui.fluid.button(overlays='sstanom')
-                  | sstanom
-              .eight.wide.column
-                button.ui.fluid.button(overlays='currents')
-                  | currents
           h2 顯示風力線
           #wind_layers
             .ui.grid.stackable
               .eight.wide.column
                 button.ui.fluid.button
                   | 風力線
-      #profile.sidebar-pane
-        h1.sidebar-header
-          | Profile
-          span.sidebar-close
-            i.fa.fa-caret-left
-
 
   #map-wrapper
     #windyty

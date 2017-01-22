@@ -11,12 +11,12 @@
 */
 
 var Windy = function( params ){
-  var VELOCITY_SCALE = 0.011;             // scale for wind velocity (completely arbitrary--this value looks nice)
+  var VELOCITY_SCALE = 1/200000;             // scale for wind velocity (completely arbitrary--this value looks nice)
   var INTENSITY_SCALE_STEP = 10;            // step size of particle intensity color scale
   var MAX_WIND_INTENSITY = 40;              // wind velocity at which particle intensity is maximum (m/s)
   var MAX_PARTICLE_AGE = 100;                // max number of frames a particle is drawn before regeneration
   var PARTICLE_LINE_WIDTH = 2;              // line width of a drawn particle
-  var PARTICLE_MULTIPLIER = 1/30;              // particle count scalar (completely arbitrary--this values looks nice)
+  var PARTICLE_MULTIPLIER = 8;              // particle count scalar (completely arbitrary--this values looks nice)
   var PARTICLE_REDUCTION = 0.75;            // reduce particle count to this much of normal for mobile devices
   var FRAME_RATE = 20;                      // desired milliseconds per frame
   var BOUNDARY = 0.45;
@@ -26,6 +26,10 @@ var Windy = function( params ){
 
   var τ = 2 * Math.PI;
   var H = Math.pow(10, -5.2);
+
+  var FADE_FILL_OPACITY = 0.9;
+  var MOVING_SPEED = 1;
+
 
   // interpolation for vectors like wind (u,v,m)
   var bilinearInterpolateVector = function(x, y, g00, g10, g01, g11) {
@@ -257,13 +261,42 @@ var Windy = function( params ){
 
 
   var project = function( lat, lon, windy) { // both in radians, use deg2rad if neccessary
+
+    if(windy.east < windy.west){
+    	var padding = 0;
+    	var east = rad2deg(windy.east);
+    	var west = rad2deg(windy.west);
+    	var lngRange = 360 + east - west;
+
+    	if(lon > 0){	//west
+    		var westPercent = (180 - west) / lngRange;
+    		var newWidth = windy.width * westPercent;
+    		east = 180;
+    	}
+
+    	if(lon < 0){	//east
+    		var eastPercent = (180 + east) / lngRange;
+    		var newWidth = windy.width * eastPercent;
+    		west = -180;
+    		padding = windy.width * (1 - eastPercent);
+    	}
+
+    	windy.width = newWidth;
+    	windy.west = deg2rad(west);
+    	windy.east = deg2rad(east);
+
+    	var xFactor = newWidth / ( east - west );
+    	var x = padding + (lon - west) * xFactor;
+    }else{
+    	var xFactor = windy.width / ( windy.east - windy.west );
+    	var x = (deg2rad(lon) - windy.west) * xFactor;
+    }
+
     var ymin = mercY(windy.south);
     var ymax = mercY(windy.north);
-    var xFactor = windy.width / ( windy.east - windy.west );
     var yFactor = windy.height / ( ymax - ymin );
 
     var y = mercY( deg2rad(lat) );
-    var x = (deg2rad(lon) - windy.west) * xFactor;
     var y = (ymax - y) * yFactor; // y points south
     return [x, y];
   };
@@ -272,11 +305,10 @@ var Windy = function( params ){
   var interpolateField = function( grid, bounds, extent, callback ) {
 
     var projection = {};
-    var velocityScale = VELOCITY_SCALE;
+    var velocityScale = bounds.height * VELOCITY_SCALE;
 
     var columns = [];
     var x = bounds.x;
-
     function interpolateColumn(x) {
         var column = [];
         for (var y = bounds.y; y <= bounds.yMax; y += 2) {
@@ -377,12 +409,12 @@ var Windy = function( params ){
     var colorStyles = windIntensityColorScale(INTENSITY_SCALE_STEP, MAX_WIND_INTENSITY);
     var buckets = colorStyles.map(function() { return []; });
 
-    var particleCount = Math.round(bounds.width * bounds.height * PARTICLE_MULTIPLIER);
+    var particleCount = Math.round(bounds.width * PARTICLE_MULTIPLIER);
     if (isMobile()) {
       particleCount *= PARTICLE_REDUCTION;
     }
 
-    var fadeFillStyle = "rgba(0, 0, 0, 0.97)";
+    var fadeFillStyle = "rgba(0, 0, 0, " + FADE_FILL_OPACITY + ")";
 
     var particles = [];
     for (var i = 0; i < particleCount; i++) {
@@ -403,8 +435,15 @@ var Windy = function( params ){
                 particle.age = MAX_PARTICLE_AGE;  // particle has escaped the grid, never to return...
             }
             else {
-                var xt = x + v[0];
-                var yt = y + v[1];
+            	// original setting
+                // var xt = x + v[0];
+                // var yt = y + v[1];
+
+                // modify by asper
+                var speedScale = MOVING_SPEED;
+                var xt = x + v[0]/speedScale;
+                var yt = y + v[1]/speedScale;
+
                 if (field(xt, yt)[2] !== null) {
                     // Path from (x,y) to (xt,yt) is visible, so add this particle to the appropriate draw bucket.
                     particle.xt = xt;
@@ -463,28 +502,28 @@ var Windy = function( params ){
   }
 
   var start = function( bounds, width, height, extent ){
+  	if( (extent[1][0] + extent[0][0]) == 0 ){ return false; }	//-180~180 means repeat x
 
-    var mapBounds = {
-      south: deg2rad(extent[0][1]),
-      north: deg2rad(extent[1][1]),
-      east: deg2rad(extent[1][0]),
-      west: deg2rad(extent[0][0]),
-      width: width,
-      height: height
-    };
+  	var mapBounds = {
+		south: deg2rad(extent[0][1]),
+		north: deg2rad(extent[1][1]),
+		east: deg2rad(extent[1][0]),
+		west: deg2rad(extent[0][0]),
+		width: width,
+		height: height
+	}
 
     stop();
 
     // build grid
     buildGrid( params.data, function(grid){
       // interpolateField
-      interpolateField( grid, buildBounds( bounds, width, height), mapBounds, function( bounds, field ){
-        // animate the canvas with random points
-        windy.field = field;
-        animate( bounds, field );
-      });
-
-    });
+	    interpolateField( grid, buildBounds( bounds, width, height), mapBounds, function( bounds, field ){
+	      // animate the canvas with random points
+	      windy.field = field;
+	      animate( bounds, field );
+	    });
+    })
   };
 
   var stop = function(){
@@ -496,7 +535,18 @@ var Windy = function( params ){
   var windy = {
     params: params,
     start: start,
-    stop: stop
+    stop: stop,
+    setFillOpacity: function(opacity){
+    	if(+opacity <= 1 && +opacity >= 0){
+    		FADE_FILL_OPACITY = opacity;
+    		params.canvas.getContext("2d").fillStyle = "rgba(0, 0, 0, " + FADE_FILL_OPACITY + ")";
+    	}
+    },
+    setMovingSpeed: function(speed){
+    	if(+speed >= 1){
+    		MOVING_SPEED = +speed;
+    	}
+    }
   };
 
   return windy;

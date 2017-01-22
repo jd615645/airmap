@@ -11,20 +11,21 @@ var air_group = ['LASS', 'Airbox', 'Indie', 'ProbeCube'];
 var marker = {'LASS': [], 'Airbox': [], 'Indie': [], 'ProbeCube': []};
 var air_site = [];
 
-var map = L.map('windyty').setView([23.854271, 120.951906], 8);
+var map = L.map('windyty',
+  {
+    center: [23.854271, 120.951906],
+    zoom: 8,
+    zoomControl: false,
+  });
 var hideWindLayer = true;
 
-L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
+	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
 var html = '<table width="100%"><tbody><tr><td>空氣溫度</td><td>-- °C</td></tr><tr><td>相對濕度</td><td>-- %</td></tr><tr><td>PM2.5</td><td>-- μg/m<sup>3</sup></td></tr></tbody></table>';
-// Required: Windyty main function is called after
-// initialization of API
-// @map is instance of Leaflet maps
 
 windytyMain(map);
-windLayer();
 
 function windytyMain(map) {
   // L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
@@ -62,13 +63,14 @@ function windytyMain(map) {
             lng: lng
           };
 
-          marker[iv][num] = L.circleMarker([lat, lng],
+          marker[iv][num] =
+            L.circleMarker([lat, lng],
             {
               color: markerColor(pm25),
               opacity: 1,
-              fillOpacity: 0.5,
+              fillOpacity: 0.5
             })
-                            .bindPopup(info_html(siteName, siteType, channelId, pm25, humidity, temperature, last_time));
+             .bindPopup(info_html(siteName, siteType, channelId, pm25, humidity, temperature, last_time));
           num++;
         }
       });
@@ -77,6 +79,7 @@ function windytyMain(map) {
       });
     });
   });
+  windLayer();
 }
 $('#filter_type button').click(function() {
   marker_view = parseInt($(this).attr('value'));
@@ -201,11 +204,12 @@ function windLayer() {
   var rasterLayer;
 
   $.get('../json/gfs.json', { cache:true } ).success(function(result) {
-    console.log(result);
+  // $.get('https://raw.githubusercontent.com/Aspertw/AirMap/master/static/gfs.json', { cache:true } ).success(function(result) {
     var timer = null;
 
     //Add CanvasLayer to the map
     canvasOverlay = L.canvasOverlay()
+                     .drawing(redraw)
                      .addTo(map);
 
     //windy object
@@ -224,9 +228,6 @@ function windLayer() {
         var bounds = map.getBounds();
         var size = map.getSize();
 
-        /*context.rect(0,0,3000,3000);
-        context.fillStyle = "red";
-        context.fill();*/
 
         windy.start( [[0,0],[size.x, size.y]], size.x, size.y,
             [[bounds._southWest.lng, bounds._southWest.lat ],[bounds._northEast.lng, bounds._northEast.lat]] );
@@ -253,13 +254,9 @@ function windLayer() {
         clearWind();
       }
       hideWindLayer = !hideWindLayer;
-    })
+    });
+    clearWind();
   })
-
-  // does the browser support canvas?
-  function supports_canvas() {
-    return !!document.createElement("canvas").getContext;
-  }
 
   function redraw(){
 
